@@ -16,7 +16,6 @@
 package {{.ProjectPkg}}.controller;
 
 import com.airparking.cloud.common.AbstractController;
-import com.airparking.cloud.common.dao.AbstractDAO;
 import {{.ProjectPkg}}.{{.ModelPkg}}.{{.ModelName}};
 import {{.ProjectPkg}}.service.{{.ModelName}}Service;
 
@@ -32,7 +31,7 @@ import org.springframework.web.bind.annotation.RestController;
  * Created by {{.Author}} on {{.DateStr}}.
  */
 @RestController
-public interface {{.ModelName}}Controller extends AbstractController {
+public class {{.ModelName}}Controller extends AbstractController {
     @Autowired
     private {{.ModelName}}Service {{ToLowerCamel .ModelName}}Service;
 
@@ -42,8 +41,8 @@ public interface {{.ModelName}}Controller extends AbstractController {
         return this.{{ToLowerCamel .ModelName}}Service.get(id);
     }
 
-    @RequesetMapping("add")
+    @RequestMapping("add")
     public Integer add(@RequestParam("body") String {{ToLowerCamel .ModelName}}Json) {
-        return this.{{ToLowerCamel .ModelName}}Service.insert(JSONObject.parseObject({{ToLowerCamel .ModelName}}Json, Map.class));
+        return this.{{ToLowerCamel .ModelName}}Service.insert(JSONObject.parseObject({{ToLowerCamel .ModelName}}Json, {{.ModelName}}.class));
     }
 }

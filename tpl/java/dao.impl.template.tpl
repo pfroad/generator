@@ -16,22 +16,24 @@
 package {{.ProjectPkg}}.dao.impl;
 
 import com.airparking.cloud.common.dao.impl.AbstractDAOImpl;
+import {{.ProjectPkg}}.mapper.{{.ModelName}}Mapper;
 import {{.ProjectPkg}}.{{.ModelPkg}}.{{.ModelName}};
 import {{.ProjectPkg}}.dao.{{.ModelName}}DAO;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import tk.mybatis.mapper.common.Mapper;
 
 /**
  * Created by {{.Author}} on {{.DateStr}}.
  */
 @Repository
-public interface {{.ModelName}}DAOImpl extends AbstractDAOImpl<{{.ModelName}}, Long> implements {{.ModelName}}DAO {
-    @AutoWired
+public class {{.ModelName}}DAOImpl extends AbstractDAOImpl<{{.ModelName}}, Long> implements {{.ModelName}}DAO {
+    @Autowired
     private {{.ModelName}}Mapper {{ToLowerCamel .ModelName}}Mapper;
 
     @Override
     public Mapper<{{.ModelName}}> getMapper() {
-        return {{ToLowerCamel .ModelName}}DAO;
+        return {{ToLowerCamel .ModelName}}Mapper;
     }
 }

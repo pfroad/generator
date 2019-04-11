@@ -28,8 +28,8 @@ import org.springframework.stereotype.Service;
  * Created by {{.Author}} on {{.DateStr}}.
  */
 @Service
-public interface {{.ModelName}}ServiceImpl extends AbstractServiceImpl<{{.ModelName}}, Long> implements {{.ModelName}}Service {
-    @AutoWired
+public class {{.ModelName}}ServiceImpl extends AbstractServiceImpl<{{.ModelName}}, Long> implements {{.ModelName}}Service {
+    @Autowired
     private {{.ModelName}}DAO {{ToLowerCamel .ModelName}}DAO;
 
     @Override

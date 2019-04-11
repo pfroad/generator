@@ -29,7 +29,7 @@ func TestGenJavaModel(t *testing.T) {
 
 func TestGenForJava(t *testing.T) {
 	convey.Convey("failed to generate java files", t, func() {
-		err := GenForJava("airparking", "pc_price", "com.airparking.cloud.pcenter")
+		err := GenForJava("ecenter", "ec_order_item", "com.airparking.cloud.ecenter")
 		convey.So(err, convey.ShouldBeNil)
 	})
 }

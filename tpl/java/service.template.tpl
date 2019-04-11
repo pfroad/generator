@@ -15,7 +15,7 @@
  */
 package {{.ProjectPkg}}.service;
 
-import com.airparking.cloud.common.dao.AbstractService;
+import com.airparking.cloud.common.AbstractService;
 import {{.ProjectPkg}}.{{.ModelPkg}}.{{.ModelName}};
 
 /**
