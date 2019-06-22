@@ -1,6 +1,7 @@
 package parser
 
 import (
+	"errors"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/iancoleman/strcase"
@@ -84,6 +85,10 @@ func parseTable(schema, tableName, projectPkg, modelPkg string) (*table, error) 
 			return nil, err
 		}
 		cols = append(cols, col)
+	}
+
+	if len(cols) == 0 {
+		return nil, errors.New(fmt.Sprintf("Cannot found table %s", tableName))
 	}
 
 	var u *user.User

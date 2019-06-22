@@ -10,6 +10,8 @@ import (
 	"text/template"
 )
 
+var ostype = runtime.GOOS
+
 func GenForJava(schema, tableName, projectPkg string) error {
 	var err error
 	var t *table
@@ -91,9 +93,20 @@ func CurrentFile() string {
 
 func CurrentDir() string {
 	fp := CurrentFile()
+
+	if ostype == "windows" {
+		return fp[:strings.LastIndex(fp, "/")]
+	}
+	//else if ostype == "linux"{
+	//	path = path +"/" + "config/"
+	//}
 	return fp[:strings.LastIndex(fp, string(os.PathSeparator))]
 }
 
 func ParentDir(currentDir string) string {
+	if ostype == "windows" {
+		return currentDir[:strings.LastIndex(currentDir, "/")]
+	}
+
 	return currentDir[:strings.LastIndex(currentDir, string(os.PathSeparator))]
 }
