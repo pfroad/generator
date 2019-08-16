@@ -15,15 +15,23 @@
 package cmd
 
 import (
+	"database/sql"
 	"fmt"
 	"os"
 
-	homedir "github.com/mitchellh/go-homedir"
+	"github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+
+	_ "github.com/go-sql-driver/mysql"
 )
 
-var cfgFile string
+var (
+	cfgFile string
+	schema  string
+	tables  string
+	output  string
+)
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -37,20 +45,16 @@ This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
-	//	Run: func(cmd *cobra.Command, args []string) { },
+	//Run: func(cmd *cobra.Command, args []string) {
+	//	fmt.Println("Run rootCmd")
+	//},
 }
 
 var startCmd = &cobra.Command{
-	Use:   "gen [COMMAND]",
+	Use:   "start [COMMAND] [OPTIONS]",
 	Short: "start generator",
 	Run: func(cmd *cobra.Command, args []string) {
-	},
-}
-
-var genModelCmd = &cobra.Command{
-	Use:   "model",
-	Short: "gen mybatis models",
-	Run: func(cmd *cobra.Command, args []string) {
+		fmt.Println("Run start")
 	},
 }
 
@@ -58,6 +62,7 @@ var helpCmd = &cobra.Command{
 	Use:   "help",
 	Short: "Print generator help",
 	Run: func(cmd *cobra.Command, args []string) {
+		fmt.Println("help called")
 	},
 }
 
@@ -85,13 +90,18 @@ func init() {
 	// will be global for your application.
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.generator.yaml)")
 
+	// Local flag only for this command
+	gogenCmd.Flags().StringVar(&schema, "schema", "", "database schema")
+	gogenCmd.Flags().StringVar(&tables, "tables", "", "model database tables, use \",\" split. a,b,c")
+	gogenCmd.Flags().StringVar(&output, "output", "", "output directory")
+
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
 	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 	rootCmd.AddCommand(startCmd)
 	rootCmd.AddCommand(helpCmd)
 	rootCmd.AddCommand(versionCmd)
-	startCmd.AddCommand(genModelCmd)
+	rootCmd.AddCommand(gogenCmd)
 }
 
 // initConfig reads in config file and ENV variables if set.
@@ -117,5 +127,19 @@ func initConfig() {
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err == nil {
 		fmt.Println("Using config file:", viper.ConfigFileUsed())
+	}
+
+	conn := fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8",
+		"apuser", "airparking", "10.35.22.61:3306", "airparking")
+	//conn := "apuser:airparking@tcp(10.35.22.61:3306)/airparking"
+	//viper.GetString("db.user"),
+	//viper.GetString("db.password"),
+	//viper.GetString("addr"),
+	//viper.GetString("schema"))
+	var err error
+	db, err = sql.Open("mysql", conn)
+
+	if err != nil {
+		os.Exit(0)
 	}
 }
