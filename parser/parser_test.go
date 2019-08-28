@@ -6,7 +6,7 @@ import (
 )
 
 func TestParseTable(t *testing.T) {
-	Convey("Failed to parse table", t, func() {
+	Convey("Failed to parse Table", t, func() {
 		table, err := parseTable("airparking", "ap_bank", "com.airparking.cloud.ecenter", "model")
 		So(err, ShouldBeNil)
 

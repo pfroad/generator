@@ -1,6 +1,6 @@
 package parser
 
-type table struct {
+type Table struct {
 	schema    string
 	TableName string
 	comment   string

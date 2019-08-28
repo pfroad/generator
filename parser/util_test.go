@@ -1,6 +1,7 @@
 package parser
 
 import (
+	"fmt"
 	"github.com/smartystreets/goconvey/convey"
 	"os"
 	"strings"
@@ -18,7 +19,7 @@ func TestCurrentFile(t *testing.T) {
 func TestGenJavaModel(t *testing.T) {
 	convey.Convey("failed to generate java file", t, func() {
 		var err error
-		var t *table
+		var t *Table
 		t, err = parseTable("airparking", "ap_lease", "com.airparking.cloud.ecenter", "model")
 		convey.So(err, convey.ShouldBeNil)
 
@@ -32,4 +33,8 @@ func TestGenForJava(t *testing.T) {
 		err := GenForJava("airparking", "u_invoice_info", "com.airparking.cloud.old")
 		convey.So(err, convey.ShouldBeNil)
 	})
+}
+
+func TestString(t *testing.T) {
+	fmt.Println(strings.ToLower("X-B3-Parentspanid"))
 }

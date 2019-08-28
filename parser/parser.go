@@ -33,7 +33,7 @@ func init() {
 	}
 }
 
-func parseSchema(schema, projectPkg, modelPkg string) ([]*table, error) {
+func parseSchema(schema, projectPkg, modelPkg string) ([]*Table, error) {
 	sql := "SELECT DISTINCT `TABLE_NAME` FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = ? AND `COLUMN_NAME` = 'id'"
 	rows, err := db.Query(sql, schema)
 
@@ -42,14 +42,14 @@ func parseSchema(schema, projectPkg, modelPkg string) ([]*table, error) {
 		return nil, err
 	}
 
-	var tables []*table
+	var tables []*Table
 	for rows.Next() {
 		var tableName string
 		if err = rows.Scan(&tableName); err != nil {
 			log.Println(err)
 			return nil, err
 		}
-		var t *table
+		var t *Table
 		t, err = parseTable(schema, tableName, projectPkg, modelPkg)
 		if err != nil {
 			log.Println(err)
@@ -61,7 +61,7 @@ func parseSchema(schema, projectPkg, modelPkg string) ([]*table, error) {
 	return tables, nil
 }
 
-func parseTable(schema, tableName, projectPkg, modelPkg string) (*table, error) {
+func parseTable(schema, tableName, projectPkg, modelPkg string) (*Table, error) {
 	sql := "SELECT `COLUMN_NAME`,`DATA_TYPE`,`COLUMN_COMMENT`,`COLUMN_KEY`,`COLUMN_TYPE`,`IS_NULLABLE` FROM `INFORMATION_SCHEMA`.`COLUMNS` WHERE`TABLE_SCHEMA` = ? AND `TABLE_NAME` = ?"
 	rows, err := db.Query(sql, schema, tableName)
 	if err != nil {
@@ -88,7 +88,7 @@ func parseTable(schema, tableName, projectPkg, modelPkg string) (*table, error) 
 	}
 
 	if len(cols) == 0 {
-		return nil, errors.New(fmt.Sprintf("Cannot found table %s", tableName))
+		return nil, errors.New(fmt.Sprintf("Cannot found Table %s", tableName))
 	}
 
 	var u *user.User
@@ -98,7 +98,7 @@ func parseTable(schema, tableName, projectPkg, modelPkg string) (*table, error) 
 		return nil, err
 	}
 
-	return &table{
+	return &Table{
 		schema:     schema,
 		TableName:  tableName,
 		Columns:    cols,

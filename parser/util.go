@@ -2,9 +2,11 @@ package parser
 
 import (
 	"errors"
+	"fmt"
 	"log"
 	"os"
 	"path"
+	"path/filepath"
 	"runtime"
 	"strings"
 	"text/template"
@@ -14,7 +16,7 @@ var ostype = runtime.GOOS
 
 func GenForJava(schema, tableName, projectPkg string) error {
 	var err error
-	var t *table
+	var t *Table
 	t, err = parseTable(schema, tableName, projectPkg, "model")
 	if err != nil {
 		log.Println(err)
@@ -52,8 +54,8 @@ func GenForJava(schema, tableName, projectPkg string) error {
 	return nil
 }
 
-func GenJavaFile(t *table, projectPkg, filePkg, tplFile, fileSuffix string) (err error) {
-	rootDir := ParentDir(CurrentDir())
+func GenJavaFile(t *Table, projectPkg, filePkg, tplFile, fileSuffix string) (err error) {
+	rootDir := getExecutePath()
 	var tmpl *template.Template
 	tmpl, err = parseTemplate(tplFile, path.Join(rootDir, "tpl/java"))
 	if err != nil {
@@ -109,4 +111,43 @@ func ParentDir(currentDir string) string {
 	}
 
 	return currentDir[:strings.LastIndex(currentDir, string(os.PathSeparator))]
+}
+
+func getExecutePath() string {
+	dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
+	if err != nil {
+		fmt.Println(err)
+	}
+	return dir
+}
+
+func getExecutePath2() string {
+	dir, err := os.Executable()
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	exPath := filepath.Dir(dir)
+	fmt.Println(exPath)
+
+	return exPath
+}
+
+func getExecutePath3() string {
+	dir, err := os.Getwd()
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println(dir)
+
+	return dir
+}
+
+func getExecutePath4() string {
+	dir, err := filepath.Abs("./")
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println(dir)
+	return dir
 }

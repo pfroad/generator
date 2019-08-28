@@ -50,25 +50,25 @@ to quickly create a Cobra application.`,
 	//},
 }
 
-var startCmd = &cobra.Command{
-	Use:   "start [COMMAND] [OPTIONS]",
-	Short: "start generator",
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("Run start")
-	},
-}
+//var startCmd = &cobra.Command{
+//	Use:   "start [COMMAND] [OPTIONS]",
+//	Short: "start generator",
+//	Run: func(cmd *cobra.Command, args []string) {
+//		fmt.Println("Run start")
+//	},
+//}
 
-var helpCmd = &cobra.Command{
-	Use:   "help",
-	Short: "Print generator help",
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("help called")
-	},
-}
+//var helpCmd = &cobra.Command{
+//	Use:   "help",
+//	Short: "Print generator help",
+//	Run: func(cmd *cobra.Command, args []string) {
+//		fmt.Println("help called")
+//	},
+//}
 
 var versionCmd = &cobra.Command{
 	Use:   "version",
-	Short: "print generator version",
+	Short: "generate 1.0.0",
 	Run: func(cmd *cobra.Command, args []string) {
 	},
 }
@@ -95,13 +95,17 @@ func init() {
 	gogenCmd.Flags().StringVar(&tables, "tables", "", "model database tables, use \",\" split. a,b,c")
 	gogenCmd.Flags().StringVar(&output, "output", "", "output directory")
 
+	jgenCmd.Flags().StringVar(&schema, "schema", "", "database schema")
+	jgenCmd.Flags().StringVar(&tables, "tables", "", "model database tables, use \",\" split. a,b,c")
+	jgenCmd.Flags().StringVar(&jPackage, "jPackage", "", "java package name")
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
 	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
-	rootCmd.AddCommand(startCmd)
-	rootCmd.AddCommand(helpCmd)
+	//rootCmd.AddCommand(startCmd)
+	//rootCmd.AddCommand(helpCmd)
 	rootCmd.AddCommand(versionCmd)
 	rootCmd.AddCommand(gogenCmd)
+	rootCmd.AddCommand(jgenCmd)
 }
 
 // initConfig reads in config file and ENV variables if set.
@@ -130,7 +134,7 @@ func initConfig() {
 	}
 
 	conn := fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8",
-		"apuser", "airparking", "10.35.22.61:3306", "airparking")
+		"apuser", "airparking", "10.35.22.61:3306", "octopus")
 	//conn := "apuser:airparking@tcp(10.35.22.61:3306)/airparking"
 	//viper.GetString("db.user"),
 	//viper.GetString("db.password"),

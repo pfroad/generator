@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"os"
 	"os/user"
 	"path"
 	"strings"
@@ -45,24 +46,29 @@ to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("gogen called")
 		ts := strings.Split(tables, ",")
+		if _, err := os.Stat(output); os.IsNotExist(err) {
+			os.MkdirAll(output, os.ModePerm)
+		}
+
+		username := "Ryan"
+		u, err := user.Current()
+		if err == nil {
+			username = u.Name
+		}
+
 		for _, t := range ts {
-			goGen(schema, t)
+			goGen(schema, t, username)
 		}
 	},
 }
 
 var db *sql.DB
 
-func goGen(schema, table string) error {
+func goGen(schema, table, username string) error {
 	f := NewFilePath(fmt.Sprintf("%s/%s/model", "pay", "wxpay"))
 	f.Comment(fmt.Sprintf("%s ", strcase.ToCamel(table)))
 
-	u, err := user.Current()
-	if err != nil {
-		log.Println(err)
-		return err
-	}
-	f.Comment(fmt.Sprintf("Created by %s at %s", u.Name, time.Now().Format("2006-01-02 15:04:05")))
+	f.Comment(fmt.Sprintf("Created by %s at %s", username, time.Now().Format("2006-01-02 15:04:05")))
 	cols, err := parseTable(schema, table)
 	if err != nil {
 		return err
@@ -75,9 +81,35 @@ func goGen(schema, table string) error {
 	}
 	f.Type().Id(strcase.ToCamel(table)).Struct(fields...)
 
+	// func TableName
+	f.Comment("TableName set model table name")
+	f.Func().Params(
+		Id("m").Op("*").Id(strcase.ToCamel(table)),
+	).Id("TableName").Params().String().Block(
+		Return(Lit(table)),
+	)
+
+	// ID
+	f.Comment("ID return model id")
+	f.Func().Params(
+		Id("m").Op("*").Id(strcase.ToCamel(table)),
+	).Id("ID").Params().Id("uint64").Block(
+		Return(Id("m.Id")),
+	)
+
+	// BeforeUpdate
+	f.Comment("BeforeUpdate set updateAt before update db in gorm")
+	f.Func().Params(
+		Id("m").Op("*").Id(strcase.ToCamel(table)),
+	).Id("BeforeUpdate").Params().Error().Block(
+		Id("now").Op(":=").Qual("time", "Now").Call(),
+		Id("m.UpdatedAt").Op("=").Op("&").Id("now"),
+		Return(Id("nil")),
+	)
+
 	fmt.Printf("%#v\n", f)
 
-	ioutil.WriteFile(path.Join(output, "model"))
+	ioutil.WriteFile(path.Join(output, fmt.Sprintf("%s.go", table)), []byte(f.GoString()), os.ModePerm)
 	return nil
 }
 
@@ -105,19 +137,29 @@ func (self *column) toField() *Statement {
 	s := Id(strcase.ToCamel(self.columnName))
 	switch self.dataType {
 	case "bigint":
-		s.Int64()
+		if strings.Contains(strings.ToLower(self.colType), "unsigned") {
+			s.Uint64()
+		} else {
+			s.Int64()
+		}
 	case "char", "varchar", "text", "nvarchar", "nchar", "mediumtext", "json", "longtext":
 		s.String()
 	case "blob":
 		s.Index().Byte()
-	case "int", "tinyint", "smallint", "mediumint":
-		s.Int()
+	case "int", "smallint", "mediumint":
+		if strings.Contains(strings.ToLower(self.colType), "unsigned") {
+			s.Uint()
+		} else {
+			s.Int()
+		}
+	case "tinyint":
+		s.Int8()
 	case "float":
 		s.Float32()
 	case "double":
 		s.Float64()
 	case "time", "datetime", "timestamp", "date":
-		s.Op("*").Qual("time", "time")
+		s.Op("*").Qual("time", "Time")
 	case "bit", "boolean":
 		s.Bool()
 	default:
