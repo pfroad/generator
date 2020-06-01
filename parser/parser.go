@@ -3,37 +3,19 @@ package parser
 import (
 	"errors"
 	"fmt"
-	_ "github.com/go-sql-driver/mysql"
-	"github.com/iancoleman/strcase"
 	"log"
 	"os/user"
 	"path"
 	"text/template"
 	"time"
 
+	_ "github.com/go-sql-driver/mysql"
+	"github.com/iancoleman/strcase"
+
 	"database/sql"
-	"os"
 )
 
-var db *sql.DB
-
-func init() {
-	conn := fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8",
-		"apuser", "airparking", "10.35.22.61:3306", "airparking")
-	//conn := "apuser:airparking@tcp(10.35.22.61:3306)/airparking"
-	//viper.GetString("db.user"),
-	//viper.GetString("db.password"),
-	//viper.GetString("addr"),
-	//viper.GetString("schema"))
-	var err error
-	db, err = sql.Open("mysql", conn)
-
-	if err != nil {
-		os.Exit(0)
-	}
-}
-
-func parseSchema(schema, projectPkg, modelPkg string) ([]*Table, error) {
+func parseSchema(db *sql.DB, schema, projectPkg, modelPkg string) ([]*Table, error) {
 	sql := "SELECT DISTINCT `TABLE_NAME` FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = ? AND `COLUMN_NAME` = 'id'"
 	rows, err := db.Query(sql, schema)
 
@@ -50,7 +32,7 @@ func parseSchema(schema, projectPkg, modelPkg string) ([]*Table, error) {
 			return nil, err
 		}
 		var t *Table
-		t, err = parseTable(schema, tableName, projectPkg, modelPkg)
+		t, err = parseTable(db, schema, tableName, projectPkg, modelPkg)
 		if err != nil {
 			log.Println(err)
 			return nil, err
@@ -61,7 +43,7 @@ func parseSchema(schema, projectPkg, modelPkg string) ([]*Table, error) {
 	return tables, nil
 }
 
-func parseTable(schema, tableName, projectPkg, modelPkg string) (*Table, error) {
+func parseTable(db *sql.DB, schema, tableName, projectPkg, modelPkg string) (*Table, error) {
 	sql := "SELECT `COLUMN_NAME`,`DATA_TYPE`,`COLUMN_COMMENT`,`COLUMN_KEY`,`COLUMN_TYPE`,`IS_NULLABLE` FROM `INFORMATION_SCHEMA`.`COLUMNS` WHERE`TABLE_SCHEMA` = ? AND `TABLE_NAME` = ?"
 	rows, err := db.Query(sql, schema, tableName)
 	if err != nil {

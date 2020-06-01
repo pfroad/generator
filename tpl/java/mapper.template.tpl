@@ -16,11 +16,9 @@
 package {{.ProjectPkg}}.mapper;
 
 import {{.ProjectPkg}}.{{.ModelPkg}}.{{.ModelName}};
-import tk.mybatis.mapper.common.Mapper;
 
 /**
  * Created by {{.Author}} on {{.DateStr}}.
  */
-@org.apache.ibatis.annotations.Mapper
 public interface {{.ModelName}}Mapper extends Mapper<{{.ModelName}}> {
 }

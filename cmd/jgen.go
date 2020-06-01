@@ -46,7 +46,7 @@ to quickly create a Cobra application.`,
 		}
 
 		for _, t := range ts {
-			err := parser.GenForJava(schema, t, jPackage)
+			err := parser.GenForJava(db, schema, t, jPackage)
 			if err != nil {
 				fmt.Printf("failed to gen schema[%s] table[%s] java files. %v\n", schema, t, err)
 			}

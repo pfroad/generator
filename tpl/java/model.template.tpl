@@ -18,9 +18,7 @@ package {{.ProjectPkg}}.{{.ModelPkg}};
 import lombok.Data;
 {{range .Columns}}{{if not .JavaLang}}
 import {{.TypeName}};{{end}}{{end}}
-import javax.persistence.Column;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.io.Serializable;
 
 /**
@@ -30,6 +28,7 @@ import java.io.Serializable;
 @Data
 public class {{.ModelName}} implements Serializable {
     {{range .Columns}}{{if .IsPrimaryKey}}@Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private {{.ShortType}} {{.Property}};   // {{.Comment}}{{else}}
     @Column(name = "{{.ColumnName}}", nullable={{.IsNullable}})
     private {{.ShortType}} {{.Property}};   // {{.Comment}}{{end}}{{end}}

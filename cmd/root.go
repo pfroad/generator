@@ -88,7 +88,7 @@ func init() {
 	// Here you will define your flags and configuration settings.
 	// Cobra supports persistent flags, which, if defined here,
 	// will be global for your application.
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.generator.yaml)")
+	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "config.yaml", "config file (default is $HOME/.config.yaml)")
 
 	// Local flag only for this command
 	gogenCmd.Flags().StringVar(&schema, "schema", "", "database schema")
@@ -133,13 +133,15 @@ func initConfig() {
 		fmt.Println("Using config file:", viper.ConfigFileUsed())
 	}
 
-	conn := fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8",
-		"apuser", "airparking", "10.35.22.61:3306", "octopus")
+	// conn := fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8",
+	// 	"apuser", "airparking", "10.35.22.61:3306", "octopus")
 	//conn := "apuser:airparking@tcp(10.35.22.61:3306)/airparking"
 	//viper.GetString("db.user"),
 	//viper.GetString("db.password"),
 	//viper.GetString("addr"),
 	//viper.GetString("schema"))
+	conn := viper.GetString("db.conn")
+
 	var err error
 	db, err = sql.Open("mysql", conn)
 

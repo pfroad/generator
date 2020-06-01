@@ -1,6 +1,7 @@
 package parser
 
 import (
+	"database/sql"
 	"errors"
 	"fmt"
 	"log"
@@ -14,10 +15,10 @@ import (
 
 var ostype = runtime.GOOS
 
-func GenForJava(schema, tableName, projectPkg string) error {
+func GenForJava(db *sql.DB, schema, tableName, projectPkg string) error {
 	var err error
 	var t *Table
-	t, err = parseTable(schema, tableName, projectPkg, "model")
+	t, err = parseTable(db, schema, tableName, projectPkg, "model")
 	if err != nil {
 		log.Println(err)
 		return err

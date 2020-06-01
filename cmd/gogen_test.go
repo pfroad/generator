@@ -18,5 +18,5 @@ func TestGoGen(t *testing.T) {
 	if err != nil {
 		os.Exit(0)
 	}
-	GoGen()
+	// GoGen()
 }
